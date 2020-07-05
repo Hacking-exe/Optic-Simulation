@@ -7,10 +7,14 @@ float c = 37.795275591;
 Lense len1;
 Lense len2;
 
+Ray ray;
+
 void setup() {
     size(800,400);
     len1 = new Lense(width/3, height/2, 7, 1, 3, 1.33);
     len2 = new Lense(2*width/3, height/2, 7, 3, 1, 1.33);
+    Lense[] lenarray = {len1, len2};
+    ray = new Ray(lenarray, height/2);
 }
 
 void draw() {
@@ -23,11 +27,9 @@ void draw() {
         //line(0,i,width,i);
     }
     
-    noStroke();
-    fill(0);
-    float y = 75;
-    ellipse(len1.value(y, true),y,5,5);
-    println(len1.value(y, true), y, len1.xPos, len1.yPos, len1.c);
+    //stroke(255,0,0);
+    strokeWeight(2);
+    ray.render();
     
     len1.render();
     len2.render();
