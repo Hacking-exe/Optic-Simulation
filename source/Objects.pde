@@ -10,17 +10,26 @@ class Ray {
     PVector[] updateRay(float h){
         PVector[] out = {new PVector(0,h)};
         PVector dir = new PVector(1, 0).normalize();
-        for(PVector i = new PVector(0,h); i.x <= width; i.add(dir)){
+        for(PVector i = new PVector(0,h); (i.x >= 0) && (i.x <= width) && (i.y >= 0); i.add(dir)){
             for(Lense len : lenses) {
                 if (abs(len.value(i.y) - i.x) < .5) {
                     out = (PVector[])append(out, new PVector(i.x, i.y));
+                    PVector norm = new PVector(1, -1*len.tang(i.y, true));
+                    PVector anorm = new PVector(-norm.x,-norm.y);
+                    float a = min(
+                        PVector.angleBetween(dir, norm),
+                        PVector.angleBetween(dir, anorm));
+                    float b = asin(1.0*sin(a)/len.n);
+                    float newDirAngle = PI - norm.heading() - b;
+                    dir = PVector.fromAngle(newDirAngle).normalize();
+                    println(dir);
                 }
                 if (abs(len.value(i.y, true) - i.x) < .5) {
                     out = (PVector[])append(out, new PVector(i.x, i.y));
                 }
             }
             
-            if(abs(i.x - width) < .5)
+            if((abs(i.x - width) < .5) || abs(i.y - height) < .5)
                 out = (PVector[])append(out, new PVector(i.x, i.y));
         }
         
@@ -38,7 +47,7 @@ class Ray {
 
 class Lense {
     float d, m, e;
-    float r;
+    float n;
     float xPos, yPos;
     float c = 37.795275591;
     
@@ -46,7 +55,7 @@ class Lense {
         d = diameter;
         m = middleWidth; 
         e = edgeWidth;
-        r = refractiveIndex;
+        n = refractiveIndex;
         xPos = x;
         yPos = y;
     }
@@ -56,7 +65,7 @@ class Lense {
         translate(xPos, yPos);
         
         noStroke();
-        fill(61, 196, 212, map(r, 1.0, 2.0, 0, 200));
+        fill(61, 196, 212, map(n, 1.0, 2.0, 0, 200));
         
         beginShape();
         for(float i = -d/2; i <= d/2; i+= 0.1) {
@@ -81,8 +90,8 @@ class Lense {
     }
     
     float tang(float y, boolean front) {
-        
-      return 0;
+        float mult = front? 1 : -1;
+        return mult * (4*(e - m) / (2 * d*d)) * ((y - yPos)/c);
     }
     
     private float f(float y) {
