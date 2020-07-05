@@ -7,15 +7,31 @@ class Ray {
         updateRay(h);
     }
     
-    void updateRay(float h){
+    PVector[] updateRay(float h){
         PVector[] out = {new PVector(0,h)};
         PVector dir = new PVector(1, 0).normalize();
-        for(PVector i = new PVector(0,h); i.x < width; i.add(dir)){
+        for(PVector i = new PVector(0,h); i.x <= width; i.add(dir)){
             for(Lense len : lenses) {
-                if (abs(len.value(i.y) - i.x) < 1) {
-                    out.append(i);
+                if (abs(len.value(i.y) - i.x) < .5) {
+                    out = (PVector[])append(out, new PVector(i.x, i.y));
+                }
+                if (abs(len.value(i.y, true) - i.x) < .5) {
+                    out = (PVector[])append(out, new PVector(i.x, i.y));
                 }
             }
+            
+            if(abs(i.x - width) < .5)
+                out = (PVector[])append(out, new PVector(i.x, i.y));
+        }
+        
+        path = out;
+        return out;
+    }
+    
+    void render(){
+        for(int i = 1; i < path.length; i++) {
+            stroke(map(i, 1, path.length, 255, 50), 0, 0);
+            line(path[i-1].x, path[i-1].y, path[i].x, path[i].y);
         }
     }
 }
@@ -62,6 +78,11 @@ class Lense {
     float value(float y, boolean back) {
         int mult = back ? 1 : -1;
         return mult * c*f((y - yPos)/c) + xPos;
+    }
+    
+    float tang(float y, boolean front) {
+        
+      return 0;
     }
     
     private float f(float y) {
