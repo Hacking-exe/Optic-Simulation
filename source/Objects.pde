@@ -12,20 +12,28 @@ class Ray {
         PVector dir = new PVector(1, 0).normalize();
         for(PVector i = new PVector(0,h); (i.x >= 0) && (i.x <= width) && (i.y >= 0); i.add(dir)){
             for(Lense len : lenses) {
-                if (abs(len.value(i.y) - i.x) < .5) {
-                    out = (PVector[])append(out, new PVector(i.x, i.y));
-                    PVector norm = new PVector(1, -1*len.tang(i.y, true));
-                    PVector anorm = new PVector(-norm.x,-norm.y);
-                    float a = min(
-                        PVector.angleBetween(dir, norm),
-                        PVector.angleBetween(dir, anorm));
-                    float b = asin(1.0*sin(a)/len.n);
-                    float newDirAngle = PI - norm.heading() - b;
-                    dir = PVector.fromAngle(newDirAngle).normalize();
-                    println(dir);
-                }
-                if (abs(len.value(i.y, true) - i.x) < .5) {
-                    out = (PVector[])append(out, new PVector(i.x, i.y));
+                out = (PVector[])append(out, new PVector(i.x, i.y));
+                if(((len.yPos - (len.d*len.c/2)) < i.y) && ((len.yPos + (len.d*len.c/2)) > i.y)) {
+                    if (abs(len.value(i.y) - i.x) < .5) {
+                        //out = (PVector[])append(out, new PVector(i.x, i.y));
+                        PVector norm = new PVector(1, -1*len.tang(i.y, true));
+                        PVector anorm = new PVector(-norm.x,-norm.y);
+                        float a = abs(dir.heading() - norm.heading()) < abs(dir.heading() - anorm.heading()) ? 
+                                  dir.heading() - norm.heading() : dir.heading() - anorm.heading();
+                        float b = asin(1.0*sin(a)/len.n);
+                        float newDirAngle = norm.heading() + b;
+                        dir = PVector.fromAngle(-newDirAngle).normalize();
+                    }
+                    if (abs(len.value(i.y, true) - i.x) < .5) {
+                        //out = (PVector[])append(out, new PVector(i.x, i.y));
+                        PVector norm = new PVector(1, -1*len.tang(i.y, false));
+                        PVector anorm = new PVector(-norm.x,-norm.y);
+                        float a = abs(dir.heading() - norm.heading()) < abs(dir.heading() - anorm.heading()) ? 
+                                  dir.heading() - norm.heading() : dir.heading() - anorm.heading();
+                        float b = asin(1.0*sin(a)/len.n);
+                        float newDirAngle = norm.heading() + b;
+                        dir = PVector.fromAngle(newDirAngle).normalize();
+                    }
                 }
             }
             
@@ -38,8 +46,8 @@ class Ray {
     }
     
     void render(){
-        for(int i = 1; i < path.length; i++) {
-            stroke(map(i, 1, path.length, 255, 50), 0, 0);
+        for(int i = 1; i < path.length; i+=2) {
+            //stroke(map(i, 1, path.length, 255, 50), 0, 0);
             line(path[i-1].x, path[i-1].y, path[i].x, path[i].y);
         }
     }
