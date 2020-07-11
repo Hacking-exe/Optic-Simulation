@@ -4,15 +4,16 @@ float e = 3;
 
 float c = 37.795275591;
 
-Lense len;
+Lense len1;
+Lense[] lenarray;
 
 Ray[] rays;
 int nRays = 10;
 
 void setup() {
     size(1500,400);
-    len = new Lense(100, height/2, 10, 4, 1, 1.5);
-    Lense[] lenarray = {len};
+    len1 = new Lense(100, height/2, 10, 4, 1, 1.5);
+    lenarray = new Lense[1]; lenarray[0] = len1; 
     rays = new Ray[nRays];
     for(int i = 0; i < nRays; i++){
         float h = i*height/(nRays +1) + height/(nRays +1);
@@ -36,5 +37,6 @@ void draw() {
     for(Ray ray : rays)
         ray.render();
     
-    len.render();
+    for(Lense lense : lenarray)
+        lense.render();
 }
