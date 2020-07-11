@@ -4,17 +4,21 @@ float e = 3;
 
 float c = 37.795275591;
 
-Lense len1;
-Lense len2;
+Lense len;
 
-Ray ray;
+Ray[] rays;
+int nRays = 10;
 
 void setup() {
-    size(800,400);
-    len1 = new Lense(width/3, height/2, 7, 1, 3, 1.33);
-    len2 = new Lense(2*width/3, height/2, 7, 3, 1, 1.33);
-    Lense[] lenarray = {len1, len2};
-    ray = new Ray(lenarray, height/2);
+    size(1500,400);
+    len = new Lense(100, height/2, 10, 4, 1, 1.5);
+    Lense[] lenarray = {len};
+    rays = new Ray[nRays];
+    for(int i = 0; i < nRays; i++){
+        float h = i*height/(nRays +1) + height/(nRays +1);
+        rays[i] = new Ray(lenarray, h);
+    }
+    
 }
 
 void draw() {
@@ -27,10 +31,10 @@ void draw() {
         //line(0,i,width,i);
     }
     
-    //stroke(255,0,0);
-    strokeWeight(2);
-    ray.render();
+    stroke(255,0,0);
+    //strokeWeight(2);
+    for(Ray ray : rays)
+        ray.render();
     
-    len1.render();
-    len2.render();
+    len.render();
 }
